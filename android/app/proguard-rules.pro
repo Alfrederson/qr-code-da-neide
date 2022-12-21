@@ -1,0 +1,1 @@
+-keep class com.zandorr.qr_code.BuildConfig { *; }
