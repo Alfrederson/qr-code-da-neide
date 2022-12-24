@@ -55,7 +55,7 @@ class _BannerAnuncioState extends State<BannerAnuncio>{
     }
     _ad = AdManagerBannerAd(
       sizes: [widget.tamanho],
-      adUnitId: 'ca-app-pub-9754268803581055/9356788332',
+      adUnitId: adUnitID,
       request: const AdManagerAdRequest(nonPersonalizedAds: true),
       listener: AdManagerBannerAdListener(
         onAdLoaded: (Ad ad){

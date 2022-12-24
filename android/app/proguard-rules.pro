@@ -1,1 +1,1 @@
--keep class com.zandorr.qr_code.BuildConfig { *; }
+-keep class com.zandorr.qr_reader.BuildConfig { *; }

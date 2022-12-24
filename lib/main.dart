@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_config/flutter_config.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'telas/tela_home.dart';
+import 'dart:developer';
 
 void main() async{
   
@@ -17,6 +18,7 @@ void main() async{
   ]);
 
   String testDeviceIds = FlutterConfig.get("TEST_DEVICE_IDS");
+  log("Ids de teste: $testDeviceIds}");
 
   // isso precisa ser chamado antes, senão o app nem inicia por causa do ADMOB.
   // também é assim no Kotlin.
