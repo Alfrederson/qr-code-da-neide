@@ -12,40 +12,33 @@ void vazia(String? s){}
 class EntradaChavePix extends StatefulWidget{
   final String hint;
   final String tipoChave;
-  final String inicial;
-  final Function(String?) onMudouTipo;
-  final Function(String?) onChanged;
-  final Function(String?) onFinished;
+  final TextEditingController? controller;
+  final Function(String?)? onMudouTipo;
+  final Function(String?)? onChanged;
+  final Function(String?)? onFinished;
   final int maxLines;
-  late final TextEditingController controller;
 
-  EntradaChavePix({super.key,
+  const EntradaChavePix({super.key,
       this.hint="",
       this.tipoChave = "cpf",
-      this.inicial = "",
-      this.onChanged=vazia,
-      this.onFinished=vazia,
-      this.onMudouTipo=vazia,
-      this.maxLines=1}){
-    
-    controller = TextEditingController(text: inicial);
+      this.controller,
+      this.onChanged,
+      this.onFinished,
+      this.onMudouTipo,
+      this.maxLines=1});
 
-  }
   @override
   State<EntradaChavePix> createState() => _EntradaChavePixState();
 }
 
 class _EntradaChavePixState extends State<EntradaChavePix> {
-  @override
-  void dispose(){
-    super.dispose();
-  }
+  late final TextEditingController controller;
 
   @override
   void initState(){
     super.initState();
+    controller = widget.controller ?? TextEditingController();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -68,12 +61,12 @@ class _EntradaChavePixState extends State<EntradaChavePix> {
                 ),
             const SizedBox(width:10),
             Expanded(child: TextFormField(
-                controller: widget.controller,
+                controller: controller,
+                onChanged: widget.onChanged,
                 maxLines: 1,
                 keyboardType: TextInputType.text,
                 style: const EntradaTextoStyle(),
-                decoration: EntradaTextoDecoration(widget.hint),
-                onChanged: widget.onChanged
+                decoration: EntradaTextoDecoration(widget.hint)
               )
             ) 
           ]

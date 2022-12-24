@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:qr_reader/actions/mostrar_dica.dart';
 
@@ -19,19 +21,26 @@ class TelaGeradorTexto extends StatefulWidget {
 }
 
 class _TelaGeradorTextoState extends State<TelaGeradorTexto> {
-  String textoEntrada = "";
   String textoQR = "";
   String etiqueta = "";
+
+  final _formKey = GlobalKey<FormState>();
+  
+  final controllerEtiqueta = TextEditingController();
+  final controllerQR = TextEditingController();
 
   @override
   void initState(){
     super.initState();
+
     // pegar o texto anterior do sharedprefs
     SharedPreferences.getInstance().then( (instance) {
-      setState((){
-        textoQR =  ler<String>(instance,"texto-qr","");
-        etiqueta = ler<String>(instance,"texto-etiqueta","");
-      });
+        controllerQR.text =  ler<String>(instance,"texto-qr","");
+        controllerEtiqueta.text = ler<String>(instance,"texto-etiqueta","");
+        setState((){
+          etiqueta = controllerEtiqueta.text;
+          textoQR = controllerQR.text;
+        });
     });
   }
 
@@ -47,14 +56,6 @@ class _TelaGeradorTextoState extends State<TelaGeradorTexto> {
       instance.setString("texto-qr",textoQR);
       instance.setString("texto-etiqueta",etiqueta);
     });
-  }
-
-  void _gerarQR(){
-    setState(
-      (){
-        
-      }
-    );
   }
 
   @override
@@ -73,20 +74,27 @@ class _TelaGeradorTextoState extends State<TelaGeradorTexto> {
                     podeCompartilhar: true,
                     textoOculto: true
                   ),
-                  Column(
-                    children:[
-                      EntradaTexto(hint: "Etiqueta do QR", inicial: etiqueta,
-                        onChanged: (t) => etiqueta = t,
-                      ),
-                      EntradaTexto(hint: "Texto para transformar em QR",inicial: textoQR, maxLines: 10,
-                          onChanged: (t) => textoQR = t,
-                      ),
-                    ]
-                  ),
-                  BotaoGrande(texto: "Gerar!", onPressed: () { 
-                      _gerarQR();
-                      mostrarDica("Toque no QR code e segure para compartilhar!", context);
-                    } ,)
+                  Form(
+                    key: _formKey,
+                    child:Column(
+                      children:[
+                        EntradaTexto(hint: "Etiqueta do QR", controller: controllerEtiqueta),
+                        EntradaTexto(hint: "Texto para transformar em QR",controller: controllerQR, maxLines: 10),
+                      ]
+                    )
+                  )
+                  ,
+                  BotaoGrande(texto: "Gerar!", 
+                    onPressed: () { 
+                      if(_formKey.currentState!.validate()){
+                        setState((){
+                          textoQR = controllerQR.text;
+                          etiqueta = controllerEtiqueta.text;
+                        });
+                        mostrarDica("Toque no QR code e segure para compartilhar!",context);
+                      }
+                    } 
+                  )
                 ]
               )
             )

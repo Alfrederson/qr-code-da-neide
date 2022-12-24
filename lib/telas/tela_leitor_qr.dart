@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:qr_reader/actions/mostrar_dica.dart';
 import 'package:qr_reader/component/botao_horizontal.dart';
 import '../component/titulo.dart';
 
@@ -35,11 +36,11 @@ class TelaLeitorQr extends StatefulWidget{
 // esquisito.
 class _TelaLeitorQrState extends State<TelaLeitorQr>{
   String qrLido = "(Leitura vai aparecer aqui)";
-  bool leuQr = true;
+  bool leuQr = false;
   bool flashLigado =false;
 
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-  QRViewController? controller;
+  late QRViewController controller;
 
   // tem que pausar a câmera se for android ou continuar a camera se for ios
   // não sei por que, tava num exemplo
@@ -48,16 +49,16 @@ class _TelaLeitorQrState extends State<TelaLeitorQr>{
   void reassemble(){
     super.reassemble();
     if(Platform.isAndroid){
-      controller!.pauseCamera();
+      controller.pauseCamera();
     }else if(Platform.isIOS){
-      controller!.resumeCamera();
+      controller.resumeCamera();
     }
   }
 
   void _copiar(){
     // notificação?
-    var toast = const SnackBar(content: Text('Texto copiado para a área de transferência'), duration: Duration(seconds: 1));
-    ScaffoldMessenger.of(context).showSnackBar(toast);
+    mostrarDica('Texto copiado para a área de transferência', context);
+    
     Clipboard.setData(ClipboardData(text: qrLido));
   }
 
@@ -67,14 +68,16 @@ class _TelaLeitorQrState extends State<TelaLeitorQr>{
   }
 
   void _maisUm(){
-    controller!.resumeCamera();
-    qrLido = "";
-    leuQr = false;
+    setState((){
+      qrLido = "";
+      leuQr = false;
+    });
+    controller.resumeCamera();
   }
 
   void _alternarFlash(){
-    controller?.toggleFlash();
-    controller?.getFlashStatus().then( (status) => 
+    controller.toggleFlash();
+    controller.getFlashStatus().then( (status) => 
       setState( (){
         flashLigado = status! ;
       })
@@ -88,50 +91,50 @@ class _TelaLeitorQrState extends State<TelaLeitorQr>{
       appBar: titulo(context,"Leitor de QR Code"),
       body: Column(
         children:[
-          SizedBox(
-            height: 400,
-            child: Stack(
-                alignment: AlignmentDirectional.bottomEnd,
-                children: [
-                  QRView(
-                    key: qrKey,
-                    onQRViewCreated: _onQRViewCreated,
-                    formatsAllowed: const [BarcodeFormat.qrcode]
-                  ),   
-                  IconButton(
-                    color:  Colors.white,
-                    padding: const EdgeInsets.all(32),
-                    iconSize: 32,
-                    icon: Icon(
-                      flashLigado ? 
-                        const IconData(0xf081, fontFamily: 'MaterialIcons') :
-                        const IconData(0xf082, fontFamily: 'MaterialIcons')
-                    ),
-                    onPressed: _alternarFlash,
-                  )                                 
-                ],
-              )
-          ),
-          const SizedBox(height:8),
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
-              scrollDirection: Axis.vertical,
-              child: Expanded(
-                  child: Text(qrLido, style: const TextStyle(fontSize:20))
-              )
+            child: Stack(
+              alignment: AlignmentDirectional.bottomEnd,
+              children: [
+                QRView(
+                  key: qrKey,
+                  onQRViewCreated: _onQRViewCreated,
+                  formatsAllowed: const [BarcodeFormat.qrcode]
+                ),
+                IconButton(
+                  color:  Colors.white,
+                  padding: const EdgeInsets.all(32),
+                  iconSize: 32,
+                  icon: Icon(
+                    flashLigado ? 
+                      const IconData(0xf081, fontFamily: 'MaterialIcons') :
+                      const IconData(0xf082, fontFamily: 'MaterialIcons')
+                  ),
+                  onPressed: _alternarFlash,
+                ),
+                if(leuQr) 
+                  SingleChildScrollView(
+                    child:Column(
+                      children:[
+                        Container(
+                          padding: const EdgeInsets.all(24),
+                          color: const Color.fromARGB(150, 0, 0, 0),
+                          child: Text(qrLido, style: const TextStyle(fontFamily: 'Monospace', fontSize:20, color: Colors.white))
+                        ),
+                        Container(
+                          color: Theme.of(context).backgroundColor,
+                          height:100,
+                          child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    BotaoHorizontal("Copiar", onLongPress: _copiarESair, onPressed: _copiar),
+                                    BotaoHorizontal("Ler outro",onPressed: _maisUm)                
+                                  ])
+                        )                        
+                      ]
+                    )
+                  )
+              ]
             )
-          ),
-          if (leuQr) 
-          SizedBox(
-            height:100,
-            child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              BotaoHorizontal("Copiar", onLongPress: _copiarESair, onPressed: _copiar),
-              BotaoHorizontal("Ler outro",onPressed: _maisUm)                
-            ]
-          )
           )
             
         ]
@@ -157,7 +160,7 @@ class _TelaLeitorQrState extends State<TelaLeitorQr>{
 
   @override
   void dispose(){
-    controller?.dispose();
+    controller.dispose();
     super.dispose();
   }
 }

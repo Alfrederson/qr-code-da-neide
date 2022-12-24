@@ -35,10 +35,28 @@ String gerarBRCode({
   required double valor,
   required String codigo
 }){
+
+  if(nome.isEmpty   ||
+     chave.isEmpty  ||
+     cidade.isEmpty ||
+     valor <= 0.01  ||
+     codigo.isEmpty
+  ){
+    return "";
+  }
+
+  nome  =nome.trim();
+  cidade=cidade.trim();
+  chave =chave.trim();
+  codigo=codigo.trim();
+  // acho que dá pra determinar o comprimento da string antecipadamente.
+  // depois eu tento fazer isso, ou não. assim já funciona.
   
   // isso retorna uma string que é (tamanho da string)(string) nesse formato das strings do brcode
   txt(String str) => "${str.length.toString().padLeft(2,"0")}$str";
+  // formata um número pra ter 0 na frente e 2 digitos
   num(int num) => num.toString().padLeft(2,"0");
+  // formata um double em fixed com um zero na frente e 2 decimais
   dec(double dindin) => dindin.toStringAsFixed(2).padLeft(4,"0");
 
   String seq = "";

@@ -10,9 +10,9 @@ Function() mudarTela(BuildContext context, Widget Function () qualTela, {bool pu
       Navigator.push(
         context,
         MaterialPageRoute(builder: (context)=>
-          !pularAnuncio && rnd.nextInt(8) == 1 ?
-          TelaAnuncio(proximaTela: qualTela) :
-          qualTela()
+          !pularAnuncio && rnd.nextInt(100) < 10 ?
+            TelaAnuncio(proximaTela: qualTela) :
+            qualTela()
         )
       );
   };

@@ -8,7 +8,7 @@ Widget menuCentral( List<Widget> children) =>
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       constraints: const BoxConstraints(
                             minWidth: double.maxFinite
-                    ),
+                         ),
       child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.center,
